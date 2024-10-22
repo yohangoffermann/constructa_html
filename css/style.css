@@ -57,8 +57,8 @@ input[type="number"] {
 
 #fluxoCaixaChart {
     width: 100%;
-    height: 400px;
-    margin-bottom: 20px;
+    height: 400px;  /* Você pode ajustar esse valor */
+    max-height: 600px;
 }
 
 table {
