@@ -1,7 +1,3 @@
-import { calcularFluxoAutoFinanciado } from './calculos.js';
-import { mostrarGraficos } from './graficos.js';
-import { atualizarAnalise } from './analise.js';
-
 const parametros = {
     vgv: 35.0,
     custo_construcao_percentual: 70,
@@ -93,9 +89,3 @@ document.addEventListener('DOMContentLoaded', () => {
         link.addEventListener('click', (e) => {
             e.preventDefault();
             const targetId = e.target.getAttribute('data-section');
-            document.querySelectorAll('main > section').forEach(section => {
-                section.style.display = section.id === targetId ? 'block' : 'none';
-            });
-        });
-    });
-});
