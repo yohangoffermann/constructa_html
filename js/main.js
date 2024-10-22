@@ -1,3 +1,5 @@
+console.log('Arquivo main.js carregado');
+
 const parametros = {
     vgv: 35.0,
     custo_construcao_percentual: 70,
@@ -12,6 +14,7 @@ const parametros = {
 };
 
 function inicializarFormulario() {
+    console.log('Inicializando formulário');
     const form = document.getElementById('parametrosForm');
     for (const [key, value] of Object.entries(parametros)) {
         const label = document.createElement('label');
@@ -35,6 +38,7 @@ function inicializarFormulario() {
 }
 
 function atualizarFluxoCaixa() {
+    console.log('Atualizando fluxo de caixa');
     const formData = new FormData(document.getElementById('parametrosForm'));
     for (const [key, value] of formData.entries()) {
         parametros[key] = Number(value);
@@ -60,6 +64,7 @@ function atualizarFluxoCaixa() {
 }
 
 function atualizarTabelaFluxoCaixa(fluxo) {
+    console.log('Atualizando tabela de fluxo de caixa');
     const tabela = document.getElementById('fluxoCaixaTable');
     tabela.innerHTML = `
         <tr>
@@ -86,6 +91,7 @@ function formatarMoeda(valor) {
 }
 
 document.addEventListener('DOMContentLoaded', () => {
+    console.log('DOM carregado');
     inicializarFormulario();
     atualizarFluxoCaixa();
 
@@ -99,6 +105,11 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     });
 
-    // Inicialização da funcionalidade de consórcio
-    inicializarConsorcio();
+    // Verifica se a função inicializarConsorcio existe e a chama
+    if (typeof window.inicializarConsorcio === 'function') {
+        console.log('Chamando inicializarConsorcio');
+        window.inicializarConsorcio();
+    } else {
+        console.warn('A função inicializarConsorcio não foi encontrada. Verifique se o arquivo consorcio.js está sendo carregado corretamente.');
+    }
 });
