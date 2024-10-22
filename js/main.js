@@ -1,3 +1,7 @@
+import { calcularFluxoAutoFinanciado } from './calculos.js';
+import { mostrarGraficos } from './graficos.js';
+import { atualizarAnalise } from './analise.js';
+
 const parametros = {
     vgv: 35.0,
     custo_construcao_percentual: 70,
