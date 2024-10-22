@@ -106,14 +106,19 @@ console.log('Arquivo consorcio.js carregado', new Date().toISOString());
                 <th>Mês</th>
                 <th>Saldo Devedor Base</th>
                 <th>Saldo Devedor com Dropdowns</th>
+                <th>Diferença</th>
             </tr>
-            ${fluxoBase.map((item, index) => `
-                <tr>
-                    <td>${item.mes}</td>
-                    <td>${formatarMoeda(item.saldoDevedor)}</td>
-                    <td>${formatarMoeda(fluxoComDropdowns[index].saldoDevedor)}</td>
-                </tr>
-            `).join('')}
+            ${fluxoBase.map((item, index) => {
+                const diferenca = item.saldoDevedor - fluxoComDropdowns[index].saldoDevedor;
+                return `
+                    <tr>
+                        <td>${item.mes}</td>
+                        <td>${formatarMoeda(item.saldoDevedor)}</td>
+                        <td>${formatarMoeda(fluxoComDropdowns[index].saldoDevedor)}</td>
+                        <td>${formatarMoeda(diferenca)}</td>
+                    </tr>
+                `;
+            }).join('')}
         `;
     }
 
