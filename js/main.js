@@ -1,7 +1,3 @@
-import { calcularFluxoAutoFinanciado } from './calculos.js';
-import { mostrarGraficos } from './graficos.js';
-import { atualizarAnalise } from './analise.js';
-
 const parametros = {
     vgv: 35.0,
     custo_construcao_percentual: 70,
@@ -16,6 +12,7 @@ const parametros = {
 };
 
 function inicializarFormulario() {
+    console.log("inicializarFormulario chamada");
     const form = document.getElementById('parametrosForm');
     for (const [key, value] of Object.entries(parametros)) {
         const label = document.createElement('label');
@@ -39,12 +36,14 @@ function inicializarFormulario() {
 }
 
 function atualizarFluxoCaixa() {
+    console.log("atualizarFluxoCaixa chamada");
     const formData = new FormData(document.getElementById('parametrosForm'));
     for (const [key, value] of formData.entries()) {
         parametros[key] = Number(value);
     }
 
     const custo_construcao = parametros.vgv * parametros.custo_construcao_percentual / 100;
+    console.log("Chamando calcularFluxoAutoFinanciado com:", parametros);
     const fluxo = calcularFluxoAutoFinanciado(
         parametros.vgv,
         custo_construcao,
@@ -58,12 +57,14 @@ function atualizarFluxoCaixa() {
         parametros.prazo_parcelas
     );
 
+    console.log("Fluxo calculado:", fluxo);
     mostrarGraficos(fluxo);
     atualizarTabelaFluxoCaixa(fluxo);
     atualizarAnalise(fluxo, parametros);
 }
 
 function atualizarTabelaFluxoCaixa(fluxo) {
+    console.log("atualizarTabelaFluxoCaixa chamada com:", fluxo);
     const tabela = document.getElementById('fluxoCaixaTable');
     tabela.innerHTML = `
         <tr>
@@ -75,27 +76,4 @@ function atualizarTabelaFluxoCaixa(fluxo) {
         </tr>
         ${fluxo.map(item => `
             <tr>
-                <td>${item.Mês}</td>
-                <td>${item.Receitas.toFixed(2)}</td>
-                <td>${item.Custos.toFixed(2)}</td>
-                <td>${item['Saldo Mensal'].toFixed(2)}</td>
-                <td>${item['Saldo Acumulado'].toFixed(2)}</td>
-            </tr>
-        `).join('')}
-    `;
-}
-
-document.addEventListener('DOMContentLoaded', () => {
-    inicializarFormulario();
-    atualizarFluxoCaixa();
-
-    document.querySelectorAll('nav a').forEach(link => {
-        link.addEventListener('click', (e) => {
-            e.preventDefault();
-            const targetId = e.target.getAttribute('data-section');
-            document.querySelectorAll('main > section').forEach(section => {
-                section.style.display = section.id === targetId ? 'block' : 'none';
-            });
-        });
-    });
-});
+                <td>${item.Mês
