@@ -1,76 +1,103 @@
-function mostrarGraficos(fluxo) {
-    const ctx = document.getElementById('fluxoCaixaChart').getContext('2d');
-    
-    if (window.myChart instanceof Chart) {
-        window.myChart.destroy();
+const parametros = {
+    vgv: 35.0,
+    custo_construcao_percentual: 70,
+    prazo_meses: 48,
+    percentual_inicio: 30,
+    percentual_meio: 40,
+    percentual_fim: 30,
+    percentual_lancamento: 20,
+    percentual_baloes: 30,
+    percentual_parcelas: 50,
+    prazo_parcelas: 48
+};
+
+function inicializarFormulario() {
+    console.log("Inicializando formulário");
+    const form = document.getElementById('parametrosForm');
+    for (const [key, value] of Object.entries(parametros)) {
+        const label = document.createElement('label');
+        label.htmlFor = key;
+        label.textContent = key.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
+        
+        const input = document.createElement('input');
+        input.type = 'number';
+        input.id = key;
+        input.name = key;
+        input.value = value;
+        input.step = key.includes('percentual') ? '1' : '0.1';
+        input.min = '0';
+        input.addEventListener('change', atualizarFluxoCaixa);
+
+        const div = document.createElement('div');
+        div.appendChild(label);
+        div.appendChild(input);
+        form.appendChild(div);
+    }
+}
+
+function atualizarFluxoCaixa() {
+    console.log("Atualizando fluxo de caixa");
+    const formData = new FormData(document.getElementById('parametrosForm'));
+    for (const [key, value] of formData.entries()) {
+        parametros[key] = Number(value);
     }
 
-    window.myChart = new Chart(ctx, {
-        type: 'line',
-        data: {
-            labels: fluxo.map(item => `Mês ${item['Mês']}`),
-            datasets: [
-                {
-                    label: 'Receitas',
-                    data: fluxo.map(item => item['Receitas']),
-                    borderColor: '#0068c9',
-                    backgroundColor: 'rgba(0, 104, 201, 0.1)',
-                    fill: true
-                },
-                {
-                    label: 'Custos',
-                    data: fluxo.map(item => item['Custos']),
-                    borderColor: '#ff2b2b',
-                    backgroundColor: 'rgba(255, 43, 43, 0.1)',
-                    fill: true
-                },
-                {
-                    label: 'Saldo Acumulado',
-                    data: fluxo.map(item => item['Saldo Acumulado']),
-                    borderColor: '#29b09d',
-                    fill: false
-                }
-            ]
-        },
-        options: {
-            responsive: true,
-            maintainAspectRatio: false,
-            aspectRatio: 2,
-            scales: {
-                x: {
-                    title: {
-                        display: true,
-                        text: 'Mês'
-                    }
-                },
-                y: {
-                    title: {
-                        display: true,
-                        text: 'Valor (R$)'
-                    },
-                    ticks: {
-                        callback: function(value) {
-                            return new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(value);
-                        }
-                    }
-                }
-            },
-            plugins: {
-                tooltip: {
-                    callbacks: {
-                        label: function(context) {
-                            let label = context.dataset.label || '';
-                            if (label) {
-                                label += ': ';
-                            }
-                            if (context.parsed.y !== null) {
-                                label += new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(context.parsed.y);
-                            }
-                            return label;
-                        }
-                    }
-                }
-            }
-        }
-    });
+    const custo_construcao = parametros.vgv * parametros.custo_construcao_percentual / 100;
+    const fluxo = calcularFluxoAutoFinanciado(
+        parametros.vgv,
+        custo_construcao,
+        parametros.prazo_meses,
+        parametros.percentual_inicio,
+        parametros.percentual_meio,
+        parametros.percentual_fim,
+        parametros.percentual_lancamento,
+        parametros.percentual_baloes,
+        parametros.percentual_parcelas,
+        parametros.prazo_parcelas
+    );
+
+    mostrarGraficos(fluxo);
+    atualizarTabelaFluxoCaixa(fluxo);
+    atualizarAnalise(fluxo, parametros);
 }
+
+function atualizarTabelaFluxoCaixa(fluxo) {
+    const tabela = document.getElementById('fluxoCaixaTable');
+    tabela.innerHTML = `
+        <tr>
+            <th>Mês</th>
+            <th>Receitas</th>
+            <th>Custos</th>
+            <th>Saldo Mensal</th>
+            <th>Saldo Acumulado</th>
+        </tr>
+        ${fluxo.map(item => `
+            <tr>
+                <td>${item.Mês}</td>
+                <td>${formatarMoeda(item.Receitas)}</td>
+                <td>${formatarMoeda(item.Custos)}</td>
+                <td>${formatarMoeda(item['Saldo Mensal'])}</td>
+                <td>${formatarMoeda(item['Saldo Acumulado'])}</td>
+            </tr>
+        `).join('')}
+    `;
+}
+
+function formatarMoeda(valor) {
+    return new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(valor);
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+    inicializarFormulario();
+    atualizarFluxoCaixa();
+
+    document.querySelectorAll('nav a').forEach(link => {
+        link.addEventListener('click', (e) => {
+            e.preventDefault();
+            const targetId = e.target.getAttribute('data-section');
+            document.querySelectorAll('main > section').forEach(section => {
+                section.style.display = section.id === targetId ? 'block' : 'none';
+            });
+        });
+    });
+});
