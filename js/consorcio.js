@@ -1,4 +1,4 @@
-console.log('Arquivo consorcio.js carregado');
+console.log('Arquivo consorcio.js carregado', new Date().toISOString());
 
 (function() {
     let dropdowns = [];
@@ -101,6 +101,61 @@ console.log('Arquivo consorcio.js carregado');
                 </tr>
             `).join('')}
         `;
+    }
+
+    function mostrarGraficoConsorcio(fluxoBase, fluxoComDropdowns) {
+        const ctx = document.getElementById('consorcioChart').getContext('2d');
+        
+        if (window.consorcioChart instanceof Chart) {
+            window.consorcioChart.destroy();
+        }
+
+        window.consorcioChart = new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: fluxoBase.map(item => `Mês ${item.mes}`),
+                datasets: [
+                    {
+                        label: 'Saldo Devedor Base',
+                        data: fluxoBase.map(item => item.saldoDevedor),
+                        borderColor: '#0068c9',
+                        fill: false
+                    },
+                    {
+                        label: 'Saldo Devedor com Dropdowns',
+                        data: fluxoComDropdowns.map(item => item.saldoDevedor),
+                        borderColor: '#29b09d',
+                        fill: false
+                    }
+                ]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        ticks: {
+                            callback: function(value) {
+                                return formatarMoeda(value);
+                            }
+                        }
+                    }
+                },
+                tooltips: {
+                    callbacks: {
+                        label: function(tooltipItem, data) {
+                            let label = data.datasets[tooltipItem.datasetIndex].label || '';
+                            if (label) {
+                                label += ': ';
+                            }
+                            label += formatarMoeda(tooltipItem.yLabel);
+                            return label;
+                        }
+                    }
+                }
+            }
+        });
     }
 
     // Exponha a função inicializarConsorcio globalmente
