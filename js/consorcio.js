@@ -14,7 +14,13 @@ console.log('Arquivo consorcio.js carregado', new Date().toISOString());
         const agio = parseFloat(document.getElementById('agioDropdown').value);
         const mes = parseInt(document.getElementById('mesDropdown').value);
 
+        if (isNaN(valor) || isNaN(agio) || isNaN(mes)) {
+            alert('Por favor, preencha todos os campos do dropdown com valores válidos.');
+            return;
+        }
+
         dropdowns.push({ valor, agio, mes });
+        console.log('Dropdown adicionado:', { valor, agio, mes });
         atualizarListaDropdowns();
     }
 
@@ -31,6 +37,12 @@ console.log('Arquivo consorcio.js carregado', new Date().toISOString());
         const incc = parseFloat(document.getElementById('incc').value);
         const duracaoConsorcio = parseInt(document.getElementById('duracaoConsorcio').value);
 
+        if (isNaN(valorCredito) || isNaN(taxaAdmin) || isNaN(incc) || isNaN(duracaoConsorcio)) {
+            alert('Por favor, preencha todos os campos do consórcio com valores válidos.');
+            return;
+        }
+
+        console.log('Calculando consórcio com dropdowns:', dropdowns);
         const fluxoBase = calcularFluxoConsorcioBase(valorCredito, taxaAdmin, incc, duracaoConsorcio);
         const fluxoComDropdowns = calcularFluxoConsorcioComDropdowns(valorCredito, taxaAdmin, incc, duracaoConsorcio, dropdowns);
 
@@ -47,14 +59,15 @@ console.log('Arquivo consorcio.js carregado', new Date().toISOString());
             if (mes % 12 === 1 && mes > 1) {
                 saldoDevedor *= (1 + incc / 100);
             }
-            saldoDevedor -= parcela;
-            fluxo.push({ mes, saldoDevedor: Math.max(saldoDevedor, 0) });
+            saldoDevedor = Math.max(saldoDevedor - parcela, 0);
+            fluxo.push({ mes, saldoDevedor });
         }
 
         return fluxo;
     }
 
     function calcularFluxoConsorcioComDropdowns(valorCredito, taxaAdmin, incc, duracaoConsorcio, dropdowns) {
+        console.log('Dropdowns recebidos:', dropdowns);
         let saldoDevedor = valorCredito;
         const fluxo = [];
         const parcela = calcularParcela(valorCredito, taxaAdmin, duracaoConsorcio);
@@ -63,14 +76,15 @@ console.log('Arquivo consorcio.js carregado', new Date().toISOString());
             if (mes % 12 === 1 && mes > 1) {
                 saldoDevedor *= (1 + incc / 100);
             }
-            saldoDevedor -= parcela;
-
+            
             const dropdown = dropdowns.find(d => d.mes === mes);
             if (dropdown) {
+                console.log(`Aplicando dropdown no mês ${mes}:`, dropdown);
                 const valorEfetivo = dropdown.valor * (1 + dropdown.agio / 100);
                 saldoDevedor = Math.max(saldoDevedor - valorEfetivo, 0);
             }
 
+            saldoDevedor = Math.max(saldoDevedor - parcela, 0);
             fluxo.push({ mes, saldoDevedor });
         }
 
