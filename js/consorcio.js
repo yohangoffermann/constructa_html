@@ -44,7 +44,9 @@ console.log('Arquivo consorcio.js carregado', new Date().toISOString());
             return;
         }
 
-        console.log('Calculando consórcio com dropdowns:', dropdowns);
+        console.log('Calculando consórcio com os seguintes parâmetros:', { valorCredito, taxaAdmin, incc, duracaoConsorcio });
+        console.log('Dropdowns:', dropdowns);
+
         const fluxoBase = calcularFluxoConsorcioBase(valorCredito, taxaAdmin, incc, duracaoConsorcio);
         const fluxoComDropdowns = calcularFluxoConsorcioComDropdowns(valorCredito, taxaAdmin, incc, duracaoConsorcio, dropdowns);
 
