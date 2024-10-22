@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Análise de Fluxo de Caixa</title>
+    <link rel="stylesheet" href="css/style.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+    <div id="app">
+        <nav>
+            <ul>
+                <li><a href="#home" data-section="home">Home</a></li>
+                <li><a href="#parametros" data-section="parametros">Parâmetros</a></li>
+                <li><a href="#fluxo-caixa" data-section="fluxo-caixa">Fluxo de Caixa</a></li>
+                <li><a href="#analise" data-section="analise">Análise</a></li>
+            </ul>
+        </nav>
+        
+        <main>
+            <section id="home">
+                <h1>Análise de Fluxo de Caixa - Modelo Auto Financiado</h1>
+                <p>Bem-vindo à ferramenta de análise de fluxo de caixa para projetos imobiliários.</p>
+                <p>Use o menu de navegação para explorar as diferentes seções.</p>
+            </section>
+
+            <section id="parametros">
+                <h2>Parâmetros do Projeto</h2>
+                <form id="parametrosForm"></form>
+            </section>
+
+            <section id="fluxo-caixa">
+                <h2>Fluxo de Caixa</h2>
+                <canvas id="fluxoCaixaChart"></canvas>
+                <table id="fluxoCaixaTable"></table>
+            </section>
+
+            <section id="analise">
+                <h2>Análise do Projeto</h2>
+                <div id="metricas"></div>
+                <div id="analiseDetalhada"></div>
+            </section>
+        </main>
+    </div>
+
+    <script src="js/main.js" type="module"></script>
+</body>
+</html>
