@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Análise de Fluxo de Caixa</title>
+    <title>Constructa - Análise de Fluxo de Caixa e Consórcios</title>
     <link rel="stylesheet" href="css/style.css">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
@@ -15,13 +15,14 @@
                 <li><a href="#parametros" data-section="parametros">Parâmetros</a></li>
                 <li><a href="#fluxo-caixa" data-section="fluxo-caixa">Fluxo de Caixa</a></li>
                 <li><a href="#analise" data-section="analise">Análise</a></li>
+                <li><a href="#consorcio" data-section="consorcio">Consórcio</a></li>
             </ul>
         </nav>
         
         <main>
             <section id="home">
-                <h1>Análise de Fluxo de Caixa - Modelo Auto Financiado</h1>
-                <p>Bem-vindo à ferramenta de análise de fluxo de caixa para projetos imobiliários.</p>
+                <h1>Constructa - Análise Financeira de Projetos Imobiliários</h1>
+                <p>Bem-vindo à ferramenta de análise de fluxo de caixa para projetos imobiliários e consórcios.</p>
                 <p>Use o menu de navegação para explorar as diferentes seções.</p>
             </section>
 
@@ -41,12 +42,55 @@
                 <div id="metricas"></div>
                 <div id="analiseDetalhada"></div>
             </section>
+
+            <section id="consorcio">
+                <h2>Análise de Consórcio</h2>
+                <form id="consorcioForm">
+                    <div>
+                        <label for="valorCredito">Valor do Crédito:</label>
+                        <input type="number" id="valorCredito" name="valorCredito" required>
+                    </div>
+                    <div>
+                        <label for="taxaAdmin">Taxa de Administração (%):</label>
+                        <input type="number" id="taxaAdmin" name="taxaAdmin" step="0.01" required>
+                    </div>
+                    <div>
+                        <label for="incc">INCC (%):</label>
+                        <input type="number" id="incc" name="incc" step="0.01" required>
+                    </div>
+                    <div>
+                        <label for="duracaoConsorcio">Duração do Consórcio (meses):</label>
+                        <input type="number" id="duracaoConsorcio" name="duracaoConsorcio" required>
+                    </div>
+                </form>
+                <h3>Adicionar Dropdown</h3>
+                <form id="dropdownForm">
+                    <div>
+                        <label for="valorDropdown">Valor do Dropdown:</label>
+                        <input type="number" id="valorDropdown" name="valorDropdown" required>
+                    </div>
+                    <div>
+                        <label for="agioDropdown">Ágio (%):</label>
+                        <input type="number" id="agioDropdown" name="agioDropdown" step="0.01" required>
+                    </div>
+                    <div>
+                        <label for="mesDropdown">Mês do Dropdown:</label>
+                        <input type="number" id="mesDropdown" name="mesDropdown" required>
+                    </div>
+                    <button type="button" id="adicionarDropdown">Adicionar Dropdown</button>
+                </form>
+                <div id="listaDropdowns"></div>
+                <button id="calcularConsorcio">Calcular Consórcio</button>
+                <canvas id="consorcioChart"></canvas>
+                <table id="consorcioTable"></table>
+            </section>
         </main>
     </div>
 
     <script src="js/calculos.js"></script>
     <script src="js/graficos.js"></script>
     <script src="js/analise.js"></script>
+    <script src="js/consorcio.js"></script>
     <script src="js/main.js"></script>
 </body>
 </html>
