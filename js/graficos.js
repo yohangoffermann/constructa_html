@@ -13,21 +13,21 @@ function mostrarGraficos(fluxo) {
                 {
                     label: 'Receitas',
                     data: fluxo.map(item => item['Receitas']),
-                    borderColor: 'rgba(75, 192, 192, 1)',
-                    backgroundColor: 'rgba(75, 192, 192, 0.2)',
+                    borderColor: '#0068c9',
+                    backgroundColor: 'rgba(0, 104, 201, 0.1)',
                     fill: true
                 },
                 {
                     label: 'Custos',
                     data: fluxo.map(item => item['Custos']),
-                    borderColor: 'rgba(255, 99, 132, 1)',
-                    backgroundColor: 'rgba(255, 99, 132, 0.2)',
+                    borderColor: '#ff2b2b',
+                    backgroundColor: 'rgba(255, 43, 43, 0.1)',
                     fill: true
                 },
                 {
                     label: 'Saldo Acumulado',
                     data: fluxo.map(item => item['Saldo Acumulado']),
-                    borderColor: 'rgba(54, 162, 235, 1)',
+                    borderColor: '#29b09d',
                     fill: false
                 }
             ]
@@ -35,7 +35,6 @@ function mostrarGraficos(fluxo) {
         options: {
             responsive: true,
             maintainAspectRatio: false,
-            aspectRatio: 2,
             scales: {
                 x: {
                     title: {
