@@ -3,6 +3,7 @@ console.log('Arquivo consorcio.js carregado');
 let dropdowns = [];
 
 function inicializarConsorcio() {
+    console.log('inicializarConsorcio chamada');
     document.getElementById('adicionarDropdown').addEventListener('click', adicionarDropdown);
     document.getElementById('calcularConsorcio').addEventListener('click', calcularConsorcio);
 }
