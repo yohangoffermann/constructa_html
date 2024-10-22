@@ -1,5 +1,4 @@
 function mostrarGraficos(fluxo) {
-    console.log("mostrarGraficos chamada com:", fluxo);
     const ctx = document.getElementById('fluxoCaixaChart').getContext('2d');
     
     if (window.myChart instanceof Chart) {
