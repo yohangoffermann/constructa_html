@@ -12,6 +12,7 @@ const parametros = {
 };
 
 function inicializarFormulario() {
+    console.log("Inicializando formulário");
     const form = document.getElementById('parametrosForm');
     for (const [key, value] of Object.entries(parametros)) {
         const label = document.createElement('label');
@@ -35,6 +36,7 @@ function inicializarFormulario() {
 }
 
 function atualizarFluxoCaixa() {
+    console.log("Atualizando fluxo de caixa");
     const formData = new FormData(document.getElementById('parametrosForm'));
     for (const [key, value] of formData.entries()) {
         parametros[key] = Number(value);
@@ -89,3 +91,9 @@ document.addEventListener('DOMContentLoaded', () => {
         link.addEventListener('click', (e) => {
             e.preventDefault();
             const targetId = e.target.getAttribute('data-section');
+            document.querySelectorAll('main > section').forEach(section => {
+                section.style.display = section.id === targetId ? 'block' : 'none';
+            });
+        });
+    });
+});
