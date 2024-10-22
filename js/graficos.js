@@ -35,6 +35,7 @@ function mostrarGraficos(fluxo) {
         options: {
             responsive: true,
             maintainAspectRatio: false,
+            aspectRatio: 2,
             scales: {
                 x: {
                     title: {
