@@ -66,7 +66,7 @@ function calcularFluxoConsorcioComDropdowns(valorCredito, taxaAdmin, incc, durac
         const dropdown = dropdowns.find(d => d.mes === mes);
         if (dropdown) {
             const valorEfetivo = dropdown.valor * (1 + dropdown.agio / 100);
-            saldoDevedor = Math.max(saldoDevedor - valorE
+            saldoDevedor = Math.max(saldoDevedor - valorE)
                                     
-(window.inicializarConsorcio = inicializarConsorcio;)
+window.inicializarConsorcio = inicializarConsorcio;
 
