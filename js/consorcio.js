@@ -1,5 +1,6 @@
 console.log('Arquivo consorcio.js carregado', new Date().toISOString());
 
+// Funções globais
 function formatarMoeda(valor) {
     return new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(valor);
 }
@@ -43,15 +44,17 @@ function mostrarGraficoConsorcio(fluxoBase, fluxoComDropdowns) {
                     }
                 }
             },
-            tooltips: {
-                callbacks: {
-                    label: function(tooltipItem, data) {
-                        let label = data.datasets[tooltipItem.datasetIndex].label || '';
-                        if (label) {
-                            label += ': ';
+            plugins: {
+                tooltip: {
+                    callbacks: {
+                        label: function(context) {
+                            let label = context.dataset.label || '';
+                            if (label) {
+                                label += ': ';
+                            }
+                            label += formatarMoeda(context.parsed.y);
+                            return label;
                         }
-                        label += formatarMoeda(tooltipItem.yLabel);
-                        return label;
                     }
                 }
             }
@@ -59,6 +62,7 @@ function mostrarGraficoConsorcio(fluxoBase, fluxoComDropdowns) {
     });
 }
 
+// IIFE para encapsulamento
 (function() {
     let dropdowns = [];
 
@@ -158,6 +162,7 @@ function mostrarGraficoConsorcio(fluxoBase, fluxoComDropdowns) {
         `;
     }
 
+    // Expor funções globalmente
     window.inicializarConsorcio = inicializarConsorcio;
     window.calcularConsorcio = calcularConsorcio;
 })();
