@@ -7,6 +7,7 @@ console.log('Arquivo consorcio.js carregado', new Date().toISOString());
         console.log('Função inicializarConsorcio chamada');
         document.getElementById('adicionarDropdown').addEventListener('click', adicionarDropdown);
         document.getElementById('calcularConsorcio').addEventListener('click', calcularConsorcio);
+        document.getElementById('limparDropdowns').addEventListener('click', limparDropdowns);
     }
 
     function adicionarDropdown() {
@@ -21,6 +22,7 @@ console.log('Arquivo consorcio.js carregado', new Date().toISOString());
 
         dropdowns.push({ valor, agio, mes });
         console.log('Dropdown adicionado:', { valor, agio, mes });
+        console.log('Lista atual de dropdowns:', dropdowns);
         atualizarListaDropdowns();
     }
 
@@ -46,6 +48,9 @@ console.log('Arquivo consorcio.js carregado', new Date().toISOString());
         const fluxoBase = calcularFluxoConsorcioBase(valorCredito, taxaAdmin, incc, duracaoConsorcio);
         const fluxoComDropdowns = calcularFluxoConsorcioComDropdowns(valorCredito, taxaAdmin, incc, duracaoConsorcio, dropdowns);
 
+        console.log('Fluxo Base:', fluxoBase);
+        console.log('Fluxo com Dropdowns:', fluxoComDropdowns);
+
         mostrarGraficoConsorcio(fluxoBase, fluxoComDropdowns);
         atualizarTabelaConsorcio(fluxoBase, fluxoComDropdowns);
     }
@@ -67,7 +72,7 @@ console.log('Arquivo consorcio.js carregado', new Date().toISOString());
     }
 
     function calcularFluxoConsorcioComDropdowns(valorCredito, taxaAdmin, incc, duracaoConsorcio, dropdowns) {
-        console.log('Dropdowns recebidos:', dropdowns);
+        console.log('Calculando fluxo com dropdowns:', dropdowns);
         let saldoDevedor = valorCredito;
         const fluxo = [];
         const parcela = calcularParcela(valorCredito, taxaAdmin, duracaoConsorcio);
@@ -82,6 +87,7 @@ console.log('Arquivo consorcio.js carregado', new Date().toISOString());
                 console.log(`Aplicando dropdown no mês ${mes}:`, dropdown);
                 const valorEfetivo = dropdown.valor * (1 + dropdown.agio / 100);
                 saldoDevedor = Math.max(saldoDevedor - valorEfetivo, 0);
+                console.log(`Saldo devedor após aplicar dropdown: ${saldoDevedor}`);
             }
 
             saldoDevedor = Math.max(saldoDevedor - parcela, 0);
@@ -177,6 +183,12 @@ console.log('Arquivo consorcio.js carregado', new Date().toISOString());
                 }
             }
         });
+    }
+
+    function limparDropdowns() {
+        dropdowns = [];
+        atualizarListaDropdowns();
+        console.log('Dropdowns limpos');
     }
 
     // Expor funções globalmente
