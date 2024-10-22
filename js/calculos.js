@@ -1,7 +1,8 @@
-export function calcularFluxoAutoFinanciado(vgv, custo_construcao, prazo_meses, 
-                                            percentual_inicio, percentual_meio, percentual_fim,
-                                            percentual_lancamento, percentual_baloes, percentual_parcelas,
-                                            prazo_parcelas) {
+function calcularFluxoAutoFinanciado(vgv, custo_construcao, prazo_meses, 
+                                     percentual_inicio, percentual_meio, percentual_fim,
+                                     percentual_lancamento, percentual_baloes, percentual_parcelas,
+                                     prazo_parcelas) {
+    console.log("calcularFluxoAutoFinanciado chamada com:", arguments);
     const fluxo = [];
     
     const custos = new Array(prazo_meses).fill(0);
@@ -45,5 +46,6 @@ export function calcularFluxoAutoFinanciado(vgv, custo_construcao, prazo_meses,
         });
     }
     
+    console.log("Fluxo calculado:", fluxo);
     return fluxo;
 }
