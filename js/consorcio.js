@@ -1,68 +1,5 @@
 console.log('Arquivo consorcio.js carregado', new Date().toISOString());
 
-// Funções globais
-function formatarMoeda(valor) {
-    return new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(valor);
-}
-
-function mostrarGraficoConsorcio(fluxoBase, fluxoComDropdowns) {
-    const ctx = document.getElementById('consorcioChart').getContext('2d');
-    
-    if (window.consorcioChart instanceof Chart) {
-        window.consorcioChart.destroy();
-    }
-
-    window.consorcioChart = new Chart(ctx, {
-        type: 'line',
-        data: {
-            labels: fluxoBase.map(item => `Mês ${item.mes}`),
-            datasets: [
-                {
-                    label: 'Saldo Devedor Base',
-                    data: fluxoBase.map(item => item.saldoDevedor),
-                    borderColor: '#0068c9',
-                    fill: false
-                },
-                {
-                    label: 'Saldo Devedor com Dropdowns',
-                    data: fluxoComDropdowns.map(item => item.saldoDevedor),
-                    borderColor: '#29b09d',
-                    fill: false
-                }
-            ]
-        },
-        options: {
-            responsive: true,
-            maintainAspectRatio: false,
-            scales: {
-                y: {
-                    beginAtZero: true,
-                    ticks: {
-                        callback: function(value) {
-                            return formatarMoeda(value);
-                        }
-                    }
-                }
-            },
-            plugins: {
-                tooltip: {
-                    callbacks: {
-                        label: function(context) {
-                            let label = context.dataset.label || '';
-                            if (label) {
-                                label += ': ';
-                            }
-                            label += formatarMoeda(context.parsed.y);
-                            return label;
-                        }
-                    }
-                }
-            }
-        }
-    });
-}
-
-// IIFE para encapsulamento
 (function() {
     let dropdowns = [];
 
@@ -144,6 +81,10 @@ function mostrarGraficoConsorcio(fluxoBase, fluxoComDropdowns) {
         return (valorCredito * (1 + taxaAdmin / 100)) / duracaoConsorcio;
     }
 
+    function formatarMoeda(valor) {
+        return new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(valor);
+    }
+
     function atualizarTabelaConsorcio(fluxoBase, fluxoComDropdowns) {
         const tabela = document.getElementById('consorcioTable');
         tabela.innerHTML = `
@@ -162,7 +103,65 @@ function mostrarGraficoConsorcio(fluxoBase, fluxoComDropdowns) {
         `;
     }
 
+    function mostrarGraficoConsorcio(fluxoBase, fluxoComDropdowns) {
+        const ctx = document.getElementById('consorcioChart').getContext('2d');
+        
+        if (window.consorcioChart instanceof Chart) {
+            window.consorcioChart.destroy();
+        }
+
+        window.consorcioChart = new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: fluxoBase.map(item => `Mês ${item.mes}`),
+                datasets: [
+                    {
+                        label: 'Saldo Devedor Base',
+                        data: fluxoBase.map(item => item.saldoDevedor),
+                        borderColor: '#0068c9',
+                        fill: false
+                    },
+                    {
+                        label: 'Saldo Devedor com Dropdowns',
+                        data: fluxoComDropdowns.map(item => item.saldoDevedor),
+                        borderColor: '#29b09d',
+                        fill: false
+                    }
+                ]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        ticks: {
+                            callback: function(value) {
+                                return formatarMoeda(value);
+                            }
+                        }
+                    }
+                },
+                plugins: {
+                    tooltip: {
+                        callbacks: {
+                            label: function(context) {
+                                let label = context.dataset.label || '';
+                                if (label) {
+                                    label += ': ';
+                                }
+                                label += formatarMoeda(context.parsed.y);
+                                return label;
+                            }
+                        }
+                    }
+                }
+            }
+        });
+    }
+
     // Expor funções globalmente
     window.inicializarConsorcio = inicializarConsorcio;
     window.calcularConsorcio = calcularConsorcio;
+    window.mostrarGraficoConsorcio = mostrarGraficoConsorcio;
 })();
