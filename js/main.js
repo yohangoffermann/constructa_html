@@ -12,7 +12,6 @@ const parametros = {
 };
 
 function inicializarFormulario() {
-    console.log("inicializarFormulario chamada");
     const form = document.getElementById('parametrosForm');
     for (const [key, value] of Object.entries(parametros)) {
         const label = document.createElement('label');
@@ -36,14 +35,12 @@ function inicializarFormulario() {
 }
 
 function atualizarFluxoCaixa() {
-    console.log("atualizarFluxoCaixa chamada");
     const formData = new FormData(document.getElementById('parametrosForm'));
     for (const [key, value] of formData.entries()) {
         parametros[key] = Number(value);
     }
 
     const custo_construcao = parametros.vgv * parametros.custo_construcao_percentual / 100;
-    console.log("Chamando calcularFluxoAutoFinanciado com:", parametros);
     const fluxo = calcularFluxoAutoFinanciado(
         parametros.vgv,
         custo_construcao,
@@ -57,14 +54,12 @@ function atualizarFluxoCaixa() {
         parametros.prazo_parcelas
     );
 
-    console.log("Fluxo calculado:", fluxo);
     mostrarGraficos(fluxo);
     atualizarTabelaFluxoCaixa(fluxo);
     atualizarAnalise(fluxo, parametros);
 }
 
 function atualizarTabelaFluxoCaixa(fluxo) {
-    console.log("atualizarTabelaFluxoCaixa chamada com:", fluxo);
     const tabela = document.getElementById('fluxoCaixaTable');
     tabela.innerHTML = `
         <tr>
@@ -76,4 +71,21 @@ function atualizarTabelaFluxoCaixa(fluxo) {
         </tr>
         ${fluxo.map(item => `
             <tr>
-                <td>${item.Mês
+                <td>${item.Mês}</td>
+                <td>${formatarMoeda(item.Receitas)}</td>
+                <td>${formatarMoeda(item.Custos)}</td>
+                <td>${formatarMoeda(item['Saldo Mensal'])}</td>
+                <td>${formatarMoeda(item['Saldo Acumulado'])}</td>
+            </tr>
+        `).join('')}
+    `;
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+    inicializarFormulario();
+    atualizarFluxoCaixa();
+
+    document.querySelectorAll('nav a').forEach(link => {
+        link.addEventListener('click', (e) => {
+            e.preventDefault();
+            
