@@ -1,3 +1,5 @@
+console.log('Arquivo consorcio.js carregado');
+
 let dropdowns = [];
 
 function inicializarConsorcio() {
