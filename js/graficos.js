@@ -1,4 +1,4 @@
-export function mostrarGraficos(fluxo) {
+function mostrarGraficos(fluxo) {
     const ctx = document.getElementById('fluxoCaixaChart').getContext('2d');
     
     if (window.myChart instanceof Chart) {
