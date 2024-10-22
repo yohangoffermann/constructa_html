@@ -5,14 +5,13 @@ body {
     max-width: 1200px;
     margin: 0 auto;
     padding: 20px;
-    background-color: #f4f4f4;
 }
 
 nav ul {
     display: flex;
     list-style-type: none;
     padding: 0;
-    background-color: #0068c9;
+    background-color: #f4f4f4;
     border-radius: 5px;
 }
 
@@ -22,30 +21,19 @@ nav ul li {
 
 nav ul li a {
     text-decoration: none;
-    color: #ffffff;
+    color: #333;
     padding: 10px 15px;
     display: block;
 }
 
 nav ul li a:hover {
-    background-color: #004b94;
-}
-
-h1, h2 {
-    color: #0068c9;
+    background-color: #ddd;
 }
 
 form {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
     gap: 20px;
-    margin-bottom: 20px;
-}
-
-label {
-    display: block;
-    margin-bottom: 5px;
-    color: #666;
 }
 
 input[type="number"] {
@@ -53,12 +41,6 @@ input[type="number"] {
     padding: 8px;
     border: 1px solid #ddd;
     border-radius: 4px;
-}
-
-#fluxoCaixaChart {
-    width: 100%;
-    height: 400px;  /* Você pode ajustar esse valor */
-    max-height: 600px;
 }
 
 table {
@@ -74,13 +56,9 @@ th, td {
 }
 
 th {
-    background-color: #0068c9;
-    color: white;
+    background-color: #f4f4f4;
 }
 
-tr:nth-child(even) {
-    background-color: #f2f2f2;
-}
 #fluxoCaixaChart {
     width: 100%;
     height: 400px;
