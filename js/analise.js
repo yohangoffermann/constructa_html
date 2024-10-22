@@ -1,10 +1,12 @@
-export function atualizarAnalise(fluxo, parametros) {
+function atualizarAnalise(fluxo, parametros) {
+    console.log("atualizarAnalise chamada com:", fluxo, parametros);
     const lucro_total = fluxo.reduce((sum, item) => sum + item['Saldo Mensal'], 0);
     const margem = (lucro_total / parametros.vgv) * 100;
     const exposicao_maxima = -Math.min(...fluxo.map(item => item['Saldo Acumulado']));
     
     const mes_payback = fluxo.findIndex(item => item['Saldo Acumulado'] > 0) + 1;
     const valor_payback = mes_payback ? fluxo[mes_payback - 1]['Saldo Acumulado'] : null;
+
     const metricas = document.getElementById('metricas');
     metricas.innerHTML = `
         <h3>Métricas do Projeto</h3>
@@ -15,6 +17,7 @@ export function atualizarAnalise(fluxo, parametros) {
         <p>Exposição Máxima de Caixa: ${formatarMoeda(exposicao_maxima)}</p>
         <p>Mês de Payback: ${mes_payback ? `${mes_payback} (${formatarMoeda(valor_payback)})` : 'Não atingido'}</p>
     `;
+
     const analiseDetalhada = document.getElementById('analiseDetalhada');
     analiseDetalhada.innerHTML = `
         <h3>Análise Detalhada</h3>
@@ -36,13 +39,7 @@ export function atualizarAnalise(fluxo, parametros) {
         </ul>
     `;
 }
+
 function formatarMoeda(valor) {
     return new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(valor);
 }
-0 commit comments
-Comments
-0
- (0)
-Comment
-You're receiving notifications because you're subscribed to this thread.
-Update analise.js · yohangoffermann/constructa_html@e0395c8
