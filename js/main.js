@@ -88,4 +88,10 @@ document.addEventListener('DOMContentLoaded', () => {
     document.querySelectorAll('nav a').forEach(link => {
         link.addEventListener('click', (e) => {
             e.preventDefault();
-            
+            const targetId = e.target.getAttribute('data-section');
+            document.querySelectorAll('main > section').forEach(section => {
+                section.style.display = section.id === targetId ? 'block' : 'none';
+            });
+        });
+    });
+});
