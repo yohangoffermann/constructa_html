@@ -44,4 +44,19 @@ function atualizarFluxoCaixa() {
 
     const custo_construcao = parametros.vgv * parametros.custo_construcao_percentual / 100;
     const fluxo = calcularFluxoAutoFinanciado(
-        parametros.v
+        parametros.vgv,
+        custo_construcao,
+        parametros.prazo_meses,
+        parametros.percentual_inicio,
+        parametros.percentual_meio,
+        parametros.percentual_fim,
+        parametros.percentual_lancamento,
+        parametros.percentual_baloes,
+        parametros.percentual_parcelas,
+        parametros.prazo_parcelas
+    );
+
+    mostrarGraficos(fluxo);
+    atualizarTabelaFluxoCaixa(fluxo);
+    atualizarAnalise(fluxo, parametros);
+}
