@@ -61,6 +61,7 @@ console.log('Arquivo consorcio.js carregado', new Date().toISOString());
         }
 
         const analiseConsorcio = analisarConsorcio(fluxoBase, fluxoComDropdowns, taxaLivreRisco);
+        console.log('Análise do Consórcio:', analiseConsorcio);
 
         mostrarGraficoConsorcio(fluxoBase, fluxoComDropdowns);
         atualizarTabelaConsorcio(fluxoBase, fluxoComDropdowns);
@@ -130,7 +131,7 @@ console.log('Arquivo consorcio.js carregado', new Date().toISOString());
         
         const valorGanhoAgio = calcularValorGanhoAgio(fluxoBase, fluxoComDropdowns, parcelasPagas);
         const tempoAplicado = Math.max(0, fluxoComDropdowns.length - parcelasPagas);
-        const valorAplicado = indexFinal !== -1 && fluxoBase[indexFinal] ? fluxoBase[indexFinal].saldoDevedor : 0;
+        const valorAplicado = indexFinal !== -1 && indexFinal < fluxoBase.length ? fluxoBase[indexFinal].saldoDevedor : 0;
         const rendimentoAplicacao = calcularRendimento(valorAplicado, tempoAplicado, taxaLivreRisco);
 
         return {
@@ -172,13 +173,13 @@ console.log('Arquivo consorcio.js carregado', new Date().toISOString());
                 <th>Diferença</th>
             </tr>
             ${fluxoBase.map((item, index) => {
-                const diferenca = fluxoComDropdowns[index].saldoDevedor - item.saldoDevedor;
+                const diferenca = fluxoComDropdowns[index] ? fluxoComDropdowns[index].saldoDevedor - item.saldoDevedor : 0;
                 const highlightClass = Math.abs(diferenca) > 0.01 ? 'highlight' : '';
                 return `
                     <tr class="${highlightClass}">
                         <td>${item.mes}</td>
                         <td>${formatarMoeda(item.saldoDevedor)}</td>
-                        <td>${formatarMoeda(fluxoComDropdowns[index].saldoDevedor)}</td>
+                        <td>${fluxoComDropdowns[index] ? formatarMoeda(fluxoComDropdowns[index].saldoDevedor) : '-'}</td>
                         <td>${formatarMoeda(diferenca)}</td>
                     </tr>
                 `;
