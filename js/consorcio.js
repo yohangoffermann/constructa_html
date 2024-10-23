@@ -21,8 +21,8 @@ console.log('Arquivo consorcio.js carregado', new Date().toISOString());
         }
 
         dropdowns.push({ valor, agio, mes });
-        console.log('Dropdown adicionado:', { valor, agio, mes });
-        console.log('Lista atual de dropdowns:', dropdowns);
+        console.log(`Dropdown adicionado: Valor: ${valor}, Ágio: ${agio}%, Mês: ${mes}`);
+        console.log('Lista atual de dropdowns:', JSON.stringify(dropdowns));
         atualizarListaDropdowns();
     }
 
@@ -45,13 +45,13 @@ console.log('Arquivo consorcio.js carregado', new Date().toISOString());
         }
 
         console.log('Calculando consórcio com os seguintes parâmetros:', { valorCredito, taxaAdmin, incc, duracaoConsorcio });
-        console.log('Dropdowns:', dropdowns);
+        console.log('Dropdowns a serem aplicados:', JSON.stringify(dropdowns));
 
         const fluxoBase = calcularFluxoConsorcioBase(valorCredito, taxaAdmin, incc, duracaoConsorcio);
         const fluxoComDropdowns = calcularFluxoConsorcioComDropdowns(valorCredito, taxaAdmin, incc, duracaoConsorcio, dropdowns);
 
-        console.log('Fluxo Base:', fluxoBase);
-        console.log('Fluxo com Dropdowns:', fluxoComDropdowns);
+        console.log('Primeiros 5 meses do Fluxo Base:', fluxoBase.slice(0, 5));
+        console.log('Primeiros 5 meses do Fluxo com Dropdowns:', fluxoComDropdowns.slice(0, 5));
 
         mostrarGraficoConsorcio(fluxoBase, fluxoComDropdowns);
         atualizarTabelaConsorcio(fluxoBase, fluxoComDropdowns);
@@ -74,7 +74,7 @@ console.log('Arquivo consorcio.js carregado', new Date().toISOString());
     }
 
     function calcularFluxoConsorcioComDropdowns(valorCredito, taxaAdmin, incc, duracaoConsorcio, dropdowns) {
-        console.log('Calculando fluxo com dropdowns:', dropdowns);
+        console.log('Calculando fluxo com dropdowns:', JSON.stringify(dropdowns));
         let saldoDevedor = valorCredito;
         const fluxo = [];
         const parcela = calcularParcela(valorCredito, taxaAdmin, duracaoConsorcio);
@@ -86,7 +86,7 @@ console.log('Arquivo consorcio.js carregado', new Date().toISOString());
             
             const dropdown = dropdowns.find(d => d.mes === mes);
             if (dropdown) {
-                console.log(`Aplicando dropdown no mês ${mes}:`, dropdown);
+                console.log(`Aplicando dropdown no mês ${mes}:`, JSON.stringify(dropdown));
                 const valorEfetivo = dropdown.valor * (1 + dropdown.agio / 100);
                 saldoDevedor = Math.max(saldoDevedor - valorEfetivo, 0);
                 console.log(`Saldo devedor após aplicar dropdown: ${saldoDevedor}`);
@@ -117,9 +117,10 @@ console.log('Arquivo consorcio.js carregado', new Date().toISOString());
                 <th>Diferença</th>
             </tr>
             ${fluxoBase.map((item, index) => {
-                const diferenca = item.saldoDevedor - fluxoComDropdowns[index].saldoDevedor;
+                const diferenca = fluxoComDropdowns[index].saldoDevedor - item.saldoDevedor;
+                const highlightClass = Math.abs(diferenca) > 0.01 ? 'highlight' : '';
                 return `
-                    <tr>
+                    <tr class="${highlightClass}">
                         <td>${item.mes}</td>
                         <td>${formatarMoeda(item.saldoDevedor)}</td>
                         <td>${formatarMoeda(fluxoComDropdowns[index].saldoDevedor)}</td>
