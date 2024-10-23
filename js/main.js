@@ -1,4 +1,3 @@
-console.log('Estado de window.inicializarConsorcio:', window.inicializarConsorcio);
 console.log('Arquivo main.js carregado');
 
 const parametros = {
