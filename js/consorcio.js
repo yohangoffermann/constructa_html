@@ -24,6 +24,7 @@ console.log('Arquivo consorcio.js carregado', new Date().toISOString());
         console.log(`Dropdown adicionado: Valor: ${valor}, Ágio: ${agio}%, Mês: ${mes}`);
         console.log('Lista atual de dropdowns:', JSON.stringify(dropdowns));
         atualizarListaDropdowns();
+        calcularConsorcio(); // Recalcula o consórcio após adicionar um dropdown
     }
 
     function atualizarListaDropdowns() {
@@ -192,6 +193,7 @@ console.log('Arquivo consorcio.js carregado', new Date().toISOString());
         dropdowns = [];
         atualizarListaDropdowns();
         console.log('Dropdowns limpos');
+        calcularConsorcio(); // Recalcula o consórcio após limpar os dropdowns
     }
 
     // Expor funções globalmente
