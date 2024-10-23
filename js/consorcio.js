@@ -35,27 +35,29 @@ console.log('Arquivo consorcio.js carregado', new Date().toISOString());
     }
 
     function calcularConsorcio() {
-        const valorCredito = parseFloat(document.getElementById('valorCredito').value);
-        const taxaAdmin = parseFloat(document.getElementById('taxaAdmin').value);
-        const incc = parseFloat(document.getElementById('incc').value);
-        const duracaoConsorcio = parseInt(document.getElementById('duracaoConsorcio').value);
+    const valorCredito = parseFloat(document.getElementById('valorCredito').value);
+    const taxaAdmin = parseFloat(document.getElementById('taxaAdmin').value);
+    const incc = parseFloat(document.getElementById('incc').value);
+    const duracaoConsorcio = parseInt(document.getElementById('duracaoConsorcio').value);
+    const taxaLivreRisco = parseFloat(document.getElementById('taxaLivreRisco').value) / 100;
 
-        if (isNaN(valorCredito) || isNaN(taxaAdmin) || isNaN(incc) || isNaN(duracaoConsorcio)) {
-            alert('Por favor, preencha todos os campos do consórcio com valores válidos.');
-            return;
-        }
+    if (isNaN(valorCredito) || isNaN(taxaAdmin) || isNaN(incc) || isNaN(duracaoConsorcio) || isNaN(taxaLivreRisco)) {
+        alert('Por favor, preencha todos os campos do consórcio com valores válidos.');
+        return;
+    }
 
-        console.log('Calculando consórcio com os seguintes parâmetros:', { valorCredito, taxaAdmin, incc, duracaoConsorcio });
-        console.log('Dropdowns a serem aplicados:', dropdowns);
+    console.log('Calculando consórcio com os seguintes parâmetros:', { valorCredito, taxaAdmin, incc, duracaoConsorcio, taxaLivreRisco });
+    console.log('Dropdowns a serem aplicados:', dropdowns);
 
-        const fluxoBase = calcularFluxoConsorcioBase(valorCredito, taxaAdmin, incc, duracaoConsorcio);
-        const fluxoComDropdowns = calcularFluxoConsorcioComDropdowns(valorCredito, taxaAdmin, incc, duracaoConsorcio, dropdowns);
+    const fluxoBase = calcularFluxoConsorcioBase(valorCredito, taxaAdmin, incc, duracaoConsorcio);
+    const fluxoComDropdowns = calcularFluxoConsorcioComDropdowns(valorCredito, taxaAdmin, incc, duracaoConsorcio, dropdowns);
 
-        console.log('Primeiros 5 meses do Fluxo Base:', fluxoBase.slice(0, 5));
-        console.log('Primeiros 5 meses do Fluxo com Dropdowns:', fluxoComDropdowns.slice(0, 5));
+    const analiseConsorcio = analisarConsorcio(fluxoBase, fluxoComDropdowns, taxaLivreRisco);
 
-        mostrarGraficoConsorcio(fluxoBase, fluxoComDropdowns);
-        atualizarTabelaConsorcio(fluxoBase, fluxoComDropdowns);
+    mostrarGraficoConsorcio(fluxoBase, fluxoComDropdowns);
+    atualizarTabelaConsorcio(fluxoBase, fluxoComDropdowns);
+    exibirAnaliseConsorcio(analiseConsorcio);
+        
     }
 
     function calcularFluxoConsorcioBase(valorCredito, taxaAdmin, incc, duracaoConsorcio) {
