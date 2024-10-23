@@ -23,7 +23,6 @@ function inicializarFormulario() {
         
         const input = document.createElement('input');
         input.type = 'number';
-        input.id = key;
         input.name = key;
         input.value = value;
         input.step = key.includes('percentual') ? '1' : '0.1';
