@@ -24,6 +24,7 @@ console.log('Arquivo consorcio.js carregado', new Date().toISOString());
         console.log('Dropdown adicionado:', { valor, agio, mes });
         console.log('Lista atual de dropdowns:', dropdowns);
         atualizarListaDropdowns();
+        calcularConsorcio(); // Recalcula o consórcio após adicionar um dropdown
     }
 
     function atualizarListaDropdowns() {
@@ -147,22 +148,34 @@ console.log('Arquivo consorcio.js carregado', new Date().toISOString());
                         label: 'Saldo Devedor Base',
                         data: fluxoBase.map(item => item.saldoDevedor),
                         borderColor: '#0068c9',
-                        fill: false
+                        backgroundColor: 'rgba(0, 104, 201, 0.1)',
+                        fill: true
                     },
                     {
                         label: 'Saldo Devedor com Dropdowns',
                         data: fluxoComDropdowns.map(item => item.saldoDevedor),
                         borderColor: '#29b09d',
-                        fill: false
+                        backgroundColor: 'rgba(41, 176, 157, 0.1)',
+                        fill: true
                     }
                 ]
             },
             options: {
                 responsive: true,
                 maintainAspectRatio: false,
+                aspectRatio: 2,
                 scales: {
+                    x: {
+                        title: {
+                            display: true,
+                            text: 'Mês'
+                        }
+                    },
                     y: {
-                        beginAtZero: true,
+                        title: {
+                            display: true,
+                            text: 'Saldo Devedor (R$)'
+                        },
                         ticks: {
                             callback: function(value) {
                                 return formatarMoeda(value);
@@ -182,6 +195,9 @@ console.log('Arquivo consorcio.js carregado', new Date().toISOString());
                                 return label;
                             }
                         }
+                    },
+                    legend: {
+                        position: 'top',
                     }
                 }
             }
@@ -192,6 +208,7 @@ console.log('Arquivo consorcio.js carregado', new Date().toISOString());
         dropdowns = [];
         atualizarListaDropdowns();
         console.log('Dropdowns limpos');
+        calcularConsorcio(); // Recalcula o consórcio após limpar os dropdowns
     }
 
     // Expor funções globalmente
