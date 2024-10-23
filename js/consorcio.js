@@ -24,7 +24,7 @@ console.log('Arquivo consorcio.js carregado', new Date().toISOString());
         console.log('Dropdown adicionado:', { valor, agio, mes });
         console.log('Lista atual de dropdowns:', dropdowns);
         atualizarListaDropdowns();
-        calcularConsorcio(); // Recalcula o consórcio após adicionar um dropdown
+        calcularConsorcio();
     }
 
     function atualizarListaDropdowns() {
@@ -35,29 +35,36 @@ console.log('Arquivo consorcio.js carregado', new Date().toISOString());
     }
 
     function calcularConsorcio() {
-    const valorCredito = parseFloat(document.getElementById('valorCredito').value);
-    const taxaAdmin = parseFloat(document.getElementById('taxaAdmin').value);
-    const incc = parseFloat(document.getElementById('incc').value);
-    const duracaoConsorcio = parseInt(document.getElementById('duracaoConsorcio').value);
-    const taxaLivreRisco = parseFloat(document.getElementById('taxaLivreRisco').value) / 100;
+        const valorCredito = parseFloat(document.getElementById('valorCredito').value);
+        const taxaAdmin = parseFloat(document.getElementById('taxaAdmin').value);
+        const incc = parseFloat(document.getElementById('incc').value);
+        const duracaoConsorcio = parseInt(document.getElementById('duracaoConsorcio').value);
+        const taxaLivreRisco = parseFloat(document.getElementById('taxaLivreRisco').value) / 100;
 
-    if (isNaN(valorCredito) || isNaN(taxaAdmin) || isNaN(incc) || isNaN(duracaoConsorcio) || isNaN(taxaLivreRisco)) {
-        alert('Por favor, preencha todos os campos do consórcio com valores válidos.');
-        return;
-    }
+        if (isNaN(valorCredito) || isNaN(taxaAdmin) || isNaN(incc) || isNaN(duracaoConsorcio) || isNaN(taxaLivreRisco)) {
+            alert('Por favor, preencha todos os campos do consórcio com valores válidos.');
+            return;
+        }
 
-    console.log('Calculando consórcio com os seguintes parâmetros:', { valorCredito, taxaAdmin, incc, duracaoConsorcio, taxaLivreRisco });
-    console.log('Dropdowns a serem aplicados:', dropdowns);
+        console.log('Calculando consórcio com os seguintes parâmetros:', { valorCredito, taxaAdmin, incc, duracaoConsorcio, taxaLivreRisco });
+        console.log('Dropdowns a serem aplicados:', dropdowns);
 
-    const fluxoBase = calcularFluxoConsorcioBase(valorCredito, taxaAdmin, incc, duracaoConsorcio);
-    const fluxoComDropdowns = calcularFluxoConsorcioComDropdowns(valorCredito, taxaAdmin, incc, duracaoConsorcio, dropdowns);
+        const fluxoBase = calcularFluxoConsorcioBase(valorCredito, taxaAdmin, incc, duracaoConsorcio);
+        const fluxoComDropdowns = calcularFluxoConsorcioComDropdowns(valorCredito, taxaAdmin, incc, duracaoConsorcio, dropdowns);
 
-    const analiseConsorcio = analisarConsorcio(fluxoBase, fluxoComDropdowns, taxaLivreRisco);
+        console.log('Fluxo Base:', fluxoBase);
+        console.log('Fluxo com Dropdowns:', fluxoComDropdowns);
 
-    mostrarGraficoConsorcio(fluxoBase, fluxoComDropdowns);
-    atualizarTabelaConsorcio(fluxoBase, fluxoComDropdowns);
-    exibirAnaliseConsorcio(analiseConsorcio);
-        
+        if (fluxoBase.length === 0 || fluxoComDropdowns.length === 0) {
+            alert('Erro ao calcular os fluxos do consórcio. Por favor, verifique os parâmetros.');
+            return;
+        }
+
+        const analiseConsorcio = analisarConsorcio(fluxoBase, fluxoComDropdowns, taxaLivreRisco);
+
+        mostrarGraficoConsorcio(fluxoBase, fluxoComDropdowns);
+        atualizarTabelaConsorcio(fluxoBase, fluxoComDropdowns);
+        exibirAnaliseConsorcio(analiseConsorcio);
     }
 
     function calcularFluxoConsorcioBase(valorCredito, taxaAdmin, incc, duracaoConsorcio) {
@@ -104,6 +111,51 @@ console.log('Arquivo consorcio.js carregado', new Date().toISOString());
 
     function calcularParcela(valorCredito, taxaAdmin, duracaoConsorcio) {
         return (valorCredito * (1 + taxaAdmin / 100)) / duracaoConsorcio;
+    }
+
+    function analisarConsorcio(fluxoBase, fluxoComDropdowns, taxaLivreRisco) {
+        if (!Array.isArray(fluxoBase) || !Array.isArray(fluxoComDropdowns) || fluxoBase.length === 0 || fluxoComDropdowns.length === 0) {
+            console.error('Dados de fluxo inválidos');
+            return {
+                parcelasPagas: 0,
+                valorGanhoAgio: 0,
+                tempoAplicado: 0,
+                valorAplicado: 0,
+                rendimentoAplicacao: 0
+            };
+        }
+
+        const indexFinal = fluxoComDropdowns.findIndex(item => item && item.saldoDevedor <= 0);
+        const parcelasPagas = indexFinal !== -1 ? indexFinal + 1 : fluxoComDropdowns.length;
+        
+        const valorGanhoAgio = calcularValorGanhoAgio(fluxoBase, fluxoComDropdowns, parcelasPagas);
+        const tempoAplicado = Math.max(0, fluxoComDropdowns.length - parcelasPagas);
+        const valorAplicado = indexFinal !== -1 && fluxoBase[indexFinal] ? fluxoBase[indexFinal].saldoDevedor : 0;
+        const rendimentoAplicacao = calcularRendimento(valorAplicado, tempoAplicado, taxaLivreRisco);
+
+        return {
+            parcelasPagas,
+            valorGanhoAgio,
+            tempoAplicado,
+            valorAplicado,
+            rendimentoAplicacao
+        };
+    }
+
+    function calcularValorGanhoAgio(fluxoBase, fluxoComDropdowns, parcelasPagas) {
+        if (parcelasPagas <= 0 || parcelasPagas > fluxoBase.length || parcelasPagas > fluxoComDropdowns.length) {
+            return 0;
+        }
+        const saldoBase = fluxoBase[parcelasPagas - 1] ? fluxoBase[parcelasPagas - 1].saldoDevedor : 0;
+        const saldoComDropdowns = fluxoComDropdowns[parcelasPagas - 1] ? fluxoComDropdowns[parcelasPagas - 1].saldoDevedor : 0;
+        return Math.max(0, saldoBase - saldoComDropdowns);
+    }
+
+    function calcularRendimento(valor, meses, taxaMensal) {
+        if (meses <= 0 || valor <= 0 || taxaMensal <= 0) {
+            return 0;
+        }
+        return valor * (Math.pow(1 + taxaMensal, meses) - 1);
     }
 
     function formatarMoeda(valor) {
@@ -206,71 +258,28 @@ console.log('Arquivo consorcio.js carregado', new Date().toISOString());
         });
     }
 
+    function exibirAnaliseConsorcio(analise) {
+        const divAnalise = document.getElementById('analiseConsorcio');
+        if (!divAnalise) {
+            console.error('Elemento de análise do consórcio não encontrado');
+            return;
+        }
+        divAnalise.innerHTML = `
+            <h3>Análise do Consórcio</h3>
+            <p>Parcelas pagas: ${analise.parcelasPagas}</p>
+            <p>Valor ganho com ágio: ${formatarMoeda(analise.valorGanhoAgio)}</p>
+            <p>Tempo com saldo aplicado: ${analise.tempoAplicado} meses</p>
+            <p>Valor aplicado: ${formatarMoeda(analise.valorAplicado)}</p>
+            <p>Rendimento estimado: ${formatarMoeda(analise.rendimentoAplicacao)}</p>
+        `;
+    }
+
     function limparDropdowns() {
         dropdowns = [];
         atualizarListaDropdowns();
         console.log('Dropdowns limpos');
-        calcularConsorcio(); // Recalcula o consórcio após limpar os dropdowns
+        calcularConsorcio();
     }
-
-// ... (código existente) ...
-    function calcularConsorcio() {
-        const valorCredito = parseFloat(document.getElementById('valorCredito').value);
-        const taxaAdmin = parseFloat(document.getElementById('taxaAdmin').value);
-        const incc = parseFloat(document.getElementById('incc').value);
-        const duracaoConsorcio = parseInt(document.getElementById('duracaoConsorcio').value);
-        const taxaLivreRisco = parseFloat(document.getElementById('taxaLivreRisco').value) / 100; // Nova entrada
-        
-        if (isNaN(valorCredito) || isNaN(taxaAdmin) || isNaN(incc) || isNaN(duracaoConsorcio) || isNaN(taxaLivreRisco)) {
-        alert('Por favor, preencha todos os campos do consórcio com valores válidos.');
-        return;
-    }
-
-    console.log('Calculando consórcio com os seguintes parâmetros:', { valorCredito, taxaAdmin, incc, duracaoConsorcio, taxaLivreRisco });
-    console.log('Dropdowns a serem aplicados:', dropdowns);
-        
-        const fluxoBase = calcularFluxoConsorcioBase(valorCredito, taxaAdmin, incc, duracaoConsorcio);
-        const fluxoComDropdowns = calcularFluxoConsorcioComDropdowns(valorCredito, taxaAdmin, incc, duracaoConsorcio, dropdowns);
-
-        const analiseConsorcio = analisarConsorcio(fluxoBase, fluxoComDropdowns, taxaLivreRisco);
-
-    mostrarGraficoConsorcio(fluxoBase, fluxoComDropdowns);
-    atualizarTabelaConsorcio(fluxoBase, fluxoComDropdowns);
-    exibirAnaliseConsorcio(analiseConsorcio);
-}
-    function analisarConsorcio(fluxoBase, fluxoComDropdowns, taxaLivreRisco) {
-        const parcelasPagas = fluxoComDropdowns.findIndex(item => item.saldoDevedor === 0) + 1;
-        const valorGanhoAgio = calcularValorGanhoAgio(fluxoBase, fluxoComDropdowns);
-        const tempoAplicado = fluxoComDropdowns.length - parcelasPagas;
-        const valorAplicado = fluxoBase[parcelasPagas - 1].saldoDevedor;
-        const rendimentoAplicacao = calcularRendimento(valorAplicado, tempoAplicado, taxaLivreRisco);
-
-        return {
-            parcelasPagas,
-            valorGanhoAgio,
-            tempoAplicado,
-            valorAplicado,
-            rendimentoAplicacao
-    };
-}
-    function calcularValorGanhoAgio(fluxoBase, fluxoComDropdowns) {
-        const indexFinal = fluxoComDropdowns.findIndex(item => item.saldoDevedor === 0);
-        return fluxoBase[indexFinal].saldoDevedor - fluxoComDropdowns[indexFinal].saldoDevedor;
-}
-    function calcularRendimento(valor, meses, taxaMensal) {
-        return valor * (Math.pow(1 + taxaMensal, meses) - 1);
-}
-    function exibirAnaliseConsorcio(analise) {
-        const divAnalise = document.getElementById('analiseConsorcio');
-        divAnalise.innerHTML = `
-        <h3>Análise do Consórcio</h3>
-        <p>Parcelas pagas até quitar: ${analise.parcelasPagas}</p>
-        <p>Valor ganho com ágio: ${formatarMoeda(analise.valorGanhoAgio)}</p>
-        <p>Tempo com saldo aplicado: ${analise.tempoAplicado} meses</p>
-        <p>Valor aplicado: ${formatarMoeda(analise.valorAplicado)}</p>
-        <p>Rendimento estimado: ${formatarMoeda(analise.rendimentoAplicacao)}</p>
-    `;
-}
 
     // Expor funções globalmente
     window.inicializarConsorcio = inicializarConsorcio;
