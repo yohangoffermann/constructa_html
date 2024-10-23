@@ -100,7 +100,7 @@ tr:nth-child(even) {
     margin-bottom: 20px;
 }
 
-#fluxoCaixaChart {
+#fluxoCaixaChart, #consorcioChart {
     width: 100%;
     height: 400px;
     max-height: 600px;
@@ -108,4 +108,59 @@ tr:nth-child(even) {
 
 .highlight {
     background-color: #ffffcc;
+}
+
+/* Estilos adicionais para melhorar a aparência geral */
+
+.section {
+    background-color: #fff;
+    border-radius: 8px;
+    padding: 20px;
+    margin-bottom: 20px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.btn-group {
+    display: flex;
+    gap: 10px;
+    margin-top: 20px;
+}
+
+.btn-secondary {
+    background-color: #6c757d;
+}
+
+.btn-secondary:hover {
+    background-color: #5a6268;
+}
+
+.form-group {
+    margin-bottom: 15px;
+}
+
+.form-control {
+    width: 100%;
+    padding: 8px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    font-size: 16px;
+}
+
+.table-responsive {
+    overflow-x: auto;
+}
+
+@media (max-width: 768px) {
+    form {
+        grid-template-columns: 1fr;
+    }
+
+    nav ul {
+        flex-direction: column;
+    }
+
+    nav ul li {
+        margin-right: 0;
+        margin-bottom: 5px;
+    }
 }
