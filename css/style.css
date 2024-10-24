@@ -163,4 +163,47 @@ tr:nth-child(even) {
         margin-right: 0;
         margin-bottom: 5px;
     }
+    .kpi-container {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-around;
+    margin-top: 20px;
+}
+
+.kpi {
+    text-align: center;
+    padding: 15px;
+    margin: 10px;
+    border-radius: 8px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    background-color: #f8f9fa;
+    width: calc(33% - 20px);
+}
+
+.kpi i {
+    font-size: 2em;
+    margin-bottom: 10px;
+}
+
+.kpi h4 {
+    margin: 0;
+    font-size: 1em;
+    color: #495057;
+}
+
+.kpi p {
+    margin: 5px 0 0;
+    font-size: 1.2em;
+    font-weight: bold;
+}
+
+.kpi.positive {
+    background-color: #d4edda;
+    color: #155724;
+}
+
+.kpi.negative {
+    background-color: #f8d7da;
+    color: #721c24;
+}
 }
