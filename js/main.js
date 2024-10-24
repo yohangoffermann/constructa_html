@@ -1,5 +1,7 @@
 console.log('Arquivo main.js carregado');
 
+console.log('Verificando inicializarConsorcio:', typeof window.inicializarConsorcio);
+
 const parametros = {
     vgv: 35.0,
     custo_construcao_percentual: 70,
