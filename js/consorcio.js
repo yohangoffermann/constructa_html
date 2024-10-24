@@ -338,51 +338,105 @@ console.log('Arquivo consorcio.js carregado', new Date().toISOString());
     };
 }
     function analiseTeseDinheiroBarato(fluxoBase, fluxoComDropdowns, valorCredito, taxaAdmin, incc, duracaoConsorcio, taxaLivreRisco, dropdowns) {
-        const parcela = calcularParcela(valorCredito, taxaAdmin, duracaoConsorcio);
-        let totalParcelas = 0;
-        let ganhoAplicacoes = 0;
-        let ganhoAgio = 0;
-        let saldoAplicado = valorCredito;
+    const parcela = calcularParcela(valorCredito, taxaAdmin, duracaoConsorcio);
+    let totalParcelas = 0;
+    let ganhoAplicacoes = 0;
+    let ganhoAgio = 0;
+    let saldoAplicado = valorCredito;
 
-        const analiseDetalhada = fluxoComDropdowns.map((item, index) => {
-            const parcelaMes = item.saldoDevedor > 0 ? parcela : 0;
-            totalParcelas += parcelaMes;
+    const indexFinal = fluxoComDropdowns.findIndex(item => item.saldoDevedor <= 0);
+    const parcelasPagas = indexFinal !== -1 ? indexFinal + 1 : fluxoComDropdowns.length;
 
-            const rendimentoMes = saldoAplicado * taxaLivreRisco;
-            ganhoAplicacoes += rendimentoMes;
+    const analiseDetalhada = fluxoComDropdowns.slice(0, parcelasPagas).map((item, index) => {
+        const parcelaMes = item.saldoDevedor > 0 ? parcela : 0;
+        totalParcelas += parcelaMes;
 
-            const dropdown = dropdowns.find(d => d.mes === item.mes);
-            if (dropdown) {
-                ganhoAgio += dropdown.valor * (dropdown.agio / 100);
-                saldoAplicado -= dropdown.valor;
-            }
+        const rendimentoMes = saldoAplicado * taxaLivreRisco;
+        ganhoAplicacoes += rendimentoMes;
 
-            return {
-                mes: item.mes,
-                saldoDevedor: item.saldoDevedor,
-                parcela: parcelaMes,
-                rendimento: rendimentoMes,
-                fluxoCaixa: rendimentoMes - parcelaMes,
-                saldoAplicado: saldoAplicado
-            };
-        });
+        const dropdown = dropdowns.find(d => d.mes === item.mes);
+        if (dropdown) {
+            ganhoAgio += dropdown.valor * (dropdown.agio / 100);
+            saldoAplicado -= dropdown.valor;
+        }
 
-        const resultadoLiquido = ganhoAplicacoes + ganhoAgio - totalParcelas;
-        const percentualLucro = (resultadoLiquido / valorCredito) * 100;
+        saldoAplicado = Math.max(saldoAplicado - parcelaMes, 0);
 
         return {
-            analiseDetalhada,
-            resumo: {
-                totalCaptado: valorCredito,
-                totalPago: totalParcelas,
-                ganhoAplicacoes,
-                ganhoAgio,
-                resultadoLiquido,
-                percentualLucro
-            }
+            mes: item.mes,
+            saldoDevedor: item.saldoDevedor,
+            parcela: parcelaMes,
+            rendimento: rendimentoMes,
+            fluxoCaixa: rendimentoMes - parcelaMes,
+            saldoAplicado: saldoAplicado
         };
-    }
+    });
 
+    const resultadoLiquido = ganhoAplicacoes + ganhoAgio - totalParcelas;
+    const percentualLucro = (resultadoLiquido / valorCredito) * 100;
+
+    return {
+        analiseDetalhada,
+        resumo: {
+            totalCaptado: valorCredito,
+            totalPago: totalParcelas,
+            ganhoAplicacoes,
+            ganhoAgio,
+            resultadoLiquido,
+            percentualLucro,
+            parcelasPagas,
+            tempoComSaldoAplicado: parcelasPagas
+        }
+    };
+}
+
+    function exibirAnaliseTeseDinheiroBarato(analise) {
+    const divAnaliseDinheiroBarato = document.getElementById('analiseDinheiroBarato');
+    if (divAnaliseDinheiroBarato) {
+        divAnaliseDinheiroBarato.innerHTML = `
+            <h3>Análise da Tese "Dinheiro Barato"</h3>
+            <div class="kpi-container">
+                <div class="kpi">
+                    <i class="fas fa-money-bill-wave"></i>
+                    <h4>Total Captado</h4>
+                    <p>${formatarMoeda(analise.resumo.totalCaptado)}</p>
+                </div>
+                <div class="kpi">
+                    <i class="fas fa-hand-holding-usd"></i>
+                    <h4>Total Pago</h4>
+                    <p>${formatarMoeda(analise.resumo.totalPago)}</p>
+                </div>
+                <div class="kpi positive">
+                    <i class="fas fa-chart-line"></i>
+                    <h4>Ganho com Aplicações</h4>
+                    <p>${formatarMoeda(analise.resumo.ganhoAplicacoes)}</p>
+                </div>
+                <div class="kpi positive">
+                    <i class="fas fa-percentage"></i>
+                    <h4>Ganho com Ágio</h4>
+                    <p>${formatarMoeda(analise.resumo.ganhoAgio)}</p>
+                </div>
+                <div class="kpi ${analise.resumo.resultadoLiquido > 0 ? 'positive' : 'negative'}">
+                    <i class="fas fa-balance-scale"></i>
+                    <h4>Resultado Líquido</h4>
+                    <p>${formatarMoeda(analise.resumo.resultadoLiquido)}</p>
+                </div>
+                <div class="kpi ${analise.resumo.percentualLucro > 0 ? 'positive' : 'negative'}">
+                    <i class="fas fa-chart-pie"></i>
+                    <h4>Percentual de Lucro</h4>
+                    <p>${analise.resumo.percentualLucro.toFixed(2)}%</p>
+                </div>
+                <div class="kpi">
+                    <i class="fas fa-calendar-alt"></i>
+                    <h4>Tempo com Saldo Aplicado</h4>
+                    <p>${analise.resumo.tempoComSaldoAplicado} meses</p>
+                </div>
+            </div>
+        `;
+    }
+    console.log('Análise Detalhada:', analise.analiseDetalhada);
+    console.log('Resumo da Análise:', analise.resumo);
+}
     function mostrarGraficoComparativo(analise) {
         const ctx = document.getElementById('graficoComparativo').getContext('2d');
         
