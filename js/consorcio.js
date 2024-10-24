@@ -286,7 +286,7 @@ console.log('Arquivo consorcio.js carregado', new Date().toISOString());
         calcularConsorcio();
     }
 
-    // Novas funções adicionadas
+    // Novas funções para a análise da tese do dinheiro barato
 
     function analiseTeseDinheiroBarato(fluxoBase, fluxoComDropdowns, valorCredito, taxaAdmin, incc, duracaoConsorcio, taxaLivreRisco, dropdowns) {
         const parcela = calcularParcela(valorCredito, taxaAdmin, duracaoConsorcio);
@@ -294,78 +294,9 @@ console.log('Arquivo consorcio.js carregado', new Date().toISOString());
         let ganhoAplicacoes = 0;
         let ganhoAgio = 0;
         let saldoAplicado = valorCredito;
-        
-        const dropdown = dropdowns.find(d => d.mes === item.mes);
-            if (dropdown) {
-                ganhoAgio += dropdown.valor * (dropdown.agio / 100);
-                saldoAplicado -= dropdown.valor;
-            }
 
-            return {
-                mes: item.mes,
-                saldoDevedor: item.saldoDevedor,
-                parcela: parcelaMes,
-                rendimento: rendimentoMes,
-                fluxoCaixa: rendimentoMes - parcelaMes,
-                saldoAplicado: saldoAplicado
-            };
-        });
-
-        const resultadoLiquido = ganhoAplicacoes + ganhoAgio - totalParcelas;
-        const percentualLucro = (resultadoLiquido / valorCredito) * 100;
-
-        return {
-            analiseDetalhada,
-            resumo: {
-                totalCaptado: valorCredito,
-                totalPago: totalParcelas,
-                ganhoAplicacoes,
-                ganhoAgio,
-                resultadoLiquido,
-                percentualLucro
-            }
-        };
-    }
-
-    function exibirAnaliseTeseDinheiroBarato(analise) {
-        console.log("Análise Detalhada da Tese 'Dinheiro Barato':");
-        console.log("Resumo:");
-        console.log(`Total Captado: ${formatarMoeda(analise.resumo.totalCaptado)}`);
-        console.log(`Total Pago: ${formatarMoeda(analise.resumo.totalPago)}`);
-        console.log(`Ganho com Aplicações: ${formatarMoeda(analise.resumo.ganhoAplicacoes)}`);
-        console.log(`Ganho com Ágio: ${formatarMoeda(analise.resumo.ganhoAgio)}`);
-        console.log(`Resultado Líquido: ${formatarMoeda(analise.resumo.resultadoLiquido)}`);
-        console.log(`Percentual de Lucro: ${analise.resumo.percentualLucro.toFixed(2)}%`);
-        
-        console.log("\nAnálise Mês a Mês:");
-        analise.analiseDetalhada.forEach(item => {
-            console.log(`Mês ${item.mes}: Saldo Devedor: ${formatarMoeda(item.saldoDevedor)}, Fluxo de Caixa: ${formatarMoeda(item.fluxoCaixa)}`);
-        });
-
-        // Adicionar exibição na interface do usuário
-        const divAnaliseDinheiroBarato = document.getElementById('analiseDinheiroBarato');
-        if (divAnaliseDinheiroBarato) {
-            divAnaliseDinheiroBarato.innerHTML = `
-                <h3>Análise da Tese "Dinheiro Barato"</h3>
-                <p>Total Captado: ${formatarMoeda(analise.resumo.totalCaptado)}</p>
-                <p>Total Pago: ${formatarMoeda(analise.resumo.totalPago)}</p>
-                <p>Ganho com Aplicações: ${formatarMoeda(analise.resumo.ganhoAplicacoes)}</p>
-                <p>Ganho com Ágio: ${formatarMoeda(analise.resumo.ganhoAgio)}</p>
-                <p>Resultado Líquido: ${formatarMoeda(analise.resumo.resultadoLiquido)}</p>
-                <p>Percentual de Lucro: ${analise.resumo.percentualLucro.toFixed(2)}%</p>
-            `;
-        }
-    }
-
-    // Expor funções globalmente
-    window.inicializarConsorcio = inicializarConsorcio;
-    window.calcularConsorcio = calcularConsorcio;
-    window.mostrarGraficoConsorcio = mostrarGraficoConsorcio;
-})();
         const analiseDetalhada = fluxoComDropdowns.map((item, index) => {
             const parcelaMes = item.saldoDevedor > 0 ? parcela : 0;
             totalParcelas += parcelaMes;
 
-            const rendimentoMes = saldoAplicado * taxaLivreRisco;
-            ganhoAplicacoes += rendimentoMes;
-            
+            const rendimentoMes = saldoAplicado * taxaLivreRisco
