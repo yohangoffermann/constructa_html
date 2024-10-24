@@ -69,6 +69,7 @@ console.log('Arquivo consorcio.js carregado', new Date().toISOString());
 
         const analiseDinheiroBarato = analiseTeseDinheiroBarato(fluxoBase, fluxoComDropdowns, valorCredito, taxaAdmin, incc, duracaoConsorcio, taxaLivreRisco, dropdowns);
         exibirAnaliseTeseDinheiroBarato(analiseDinheiroBarato);
+        mostrarGraficoComparativo(analiseDinheiroBarato);
     }
 
     function calcularFluxoConsorcioBase(valorCredito, taxaAdmin, incc, duracaoConsorcio) {
@@ -332,27 +333,100 @@ console.log('Arquivo consorcio.js carregado', new Date().toISOString());
     }
 
     function exibirAnaliseTeseDinheiroBarato(analise) {
-        console.log("Análise Detalhada da Tese 'Dinheiro Barato':");
-        console.log("Resumo:");
-        console.log(`Total Captado: ${formatarMoeda(analise.resumo.totalCaptado)}`);
-        console.log(`Total Pago: ${formatarMoeda(analise.resumo.totalPago)}`);
-        console.log(`Ganho com Aplicações: ${formatarMoeda(analise.resumo.ganhoAplicacoes)}`);
-        console.log(`Ganho com Ágio: ${formatarMoeda(analise.resumo.ganhoAgio)}`);
-        console.log(`Resultado Líquido: ${formatarMoeda(analise.resumo.resultadoLiquido)}`);
-        console.log(`Percentual de Lucro: ${analise.resumo.percentualLucro.toFixed(2)}%`);
-        
         const divAnaliseDinheiroBarato = document.getElementById('analiseDinheiroBarato');
         if (divAnaliseDinheiroBarato) {
             divAnaliseDinheiroBarato.innerHTML = `
                 <h3>Análise da Tese "Dinheiro Barato"</h3>
-                <p>Total Captado: ${formatarMoeda(analise.resumo.totalCaptado)}</p>
-                <p>Total Pago: ${formatarMoeda(analise.resumo.totalPago)}</p>
-                <p>Ganho com Aplicações: ${formatarMoeda(analise.resumo.ganhoAplicacoes)}</p>
-                <p>Ganho com Ágio: ${formatarMoeda(analise.resumo.ganhoAgio)}</p>
-                <p>Resultado Líquido: ${formatarMoeda(analise.resumo.resultadoLiquido)}</p>
-                <p>Percentual de Lucro: ${analise.resumo.percentualLucro.toFixed(2)}%</p>
+                <div class="kpi-container">
+                    <div class="kpi">
+                        <i class="fas fa-money-bill-wave"></i>
+                        <h4>Total Captado</h4>
+                        <p>${formatarMoeda(analise.resumo.totalCaptado)}</p>
+                    </div>
+                    <div class="kpi">
+                        <i class="fas fa-hand-holding-usd"></i>
+                        <h4>Total Pago</h4>
+                        <p>${formatarMoeda(analise.resumo.totalPago)}</p>
+                    </div>
+                    <div class="kpi positive">
+                        <i class="fas fa-chart-line"></i>
+                        <h4>Ganho com Aplicações</h4>
+                        <p>${formatarMoeda(analise.resumo.ganhoAplicacoes)}</p>
+                    </div>
+                    <div class="kpi positive">
+                        <i class="fas fa-percentage"></i>
+                        <h4>Ganho com Ágio</h4>
+                        <p>${formatarMoeda(analise.resumo.ganhoAgio)}</p>
+                    </div>
+                    <div class="kpi ${analise.resumo.resultadoLiquido > 0 ? 'positive' : 'negative'}">
+                        <i class="fas fa-balance-scale"></i>
+                        <h4>Resultado Líquido</h4>
+                        <p>${formatarMoeda(analise.resumo.resultadoLiquido)}</p>
+                    </div>
+                    <div class="kpi ${analise.resumo.percentualLucro > 0 ? 'positive' : 'negative'}">
+                        <i class="fas fa-chart-pie"></i>
+                        <h4>Percentual de Lucro</h4>
+                        <p>${analise.resumo.percentualLucro.toFixed(2)}%</p>
+                    </div>
+                </div>
             `;
         }
+    }
+
+    function mostrarGraficoComparativo(analise) {
+        const ctx = document.getElementById('graficoComparativo').getContext('2d');
+        
+        if (window.graficoComparativo instanceof Chart) {
+            window.graficoComparativo.destroy();
+        }
+
+        window.graficoComparativo = new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: ['Total Captado', 'Total Pago', 'Ganho Total'],
+                datasets: [{
+                    label: 'Valores',
+                    data: [
+                        analise.resumo.totalCaptado,
+                        analise.resumo.totalPago,
+                        analise.resumo.ganhoAplicacoes + analise.resumo.ganhoAgio
+                    ],
+                    backgroundColor: [
+                        'rgba(255, 99, 132, 0.6)',
+                        'rgba(54, 162, 235, 0.6)',
+                        'rgba(75, 192, 192, 0.6)'
+                    ],
+                    borderColor: [
+                        'rgb(255, 99, 132)',
+                        'rgb(54, 162, 235)',
+                        'rgb(75, 192, 192)'
+                    ],
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                responsive: true,
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        ticks: {
+                            callback: function(value) {
+                                return formatarMoeda(value);
+                            }
+                        }
+                    }
+                },
+                plugins: {
+                    tooltip: {
+                        callbacks: {
+                            label: function(context) {
+                                return formatarMoeda(context.parsed.y);
+                            }
+                        }
+                    }
+                }
+            }
+        });
     }
 
     // Expor funções globalmente
