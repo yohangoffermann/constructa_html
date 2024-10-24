@@ -287,6 +287,57 @@ console.log('Arquivo consorcio.js carregado', new Date().toISOString());
     }
 
     function analiseTeseDinheiroBarato(fluxoBase, fluxoComDropdowns, valorCredito, taxaAdmin, incc, duracaoConsorcio, taxaLivreRisco, dropdowns) {
+    const parcela = calcularParcela(valorCredito, taxaAdmin, duracaoConsorcio);
+    let totalParcelas = 0;
+    let ganhoAplicacoes = 0;
+    let ganhoAgio = 0;
+    let saldoAplicado = valorCredito;
+
+    const indexFinal = fluxoComDropdowns.findIndex(item => item.saldoDevedor <= 0);
+    const parcelasPagas = indexFinal !== -1 ? indexFinal + 1 : fluxoComDropdowns.length;
+
+    const analiseDetalhada = fluxoComDropdowns.slice(0, parcelasPagas).map((item, index) => {
+        const parcelaMes = item.saldoDevedor > 0 ? parcela : 0;
+        totalParcelas += parcelaMes;
+
+        const rendimentoMes = saldoAplicado * taxaLivreRisco;
+        ganhoAplicacoes += rendimentoMes;
+
+        const dropdown = dropdowns.find(d => d.mes === item.mes);
+        if (dropdown) {
+            ganhoAgio += dropdown.valor * (dropdown.agio / 100);
+            saldoAplicado -= dropdown.valor;
+        }
+
+        saldoAplicado -= parcelaMes;
+
+        return {
+            mes: item.mes,
+            saldoDevedor: item.saldoDevedor,
+            parcela: parcelaMes,
+            rendimento: rendimentoMes,
+            fluxoCaixa: rendimentoMes - parcelaMes,
+            saldoAplicado: saldoAplicado
+        };
+    });
+
+    const resultadoLiquido = ganhoAplicacoes + ganhoAgio - totalParcelas;
+    const percentualLucro = (resultadoLiquido / valorCredito) * 100;
+
+    return {
+        analiseDetalhada,
+        resumo: {
+            totalCaptado: valorCredito,
+            totalPago: totalParcelas,
+            ganhoAplicacoes,
+            ganhoAgio,
+            resultadoLiquido,
+            percentualLucro,
+            parcelasPagas
+        }
+    };
+}
+    function analiseTeseDinheiroBarato(fluxoBase, fluxoComDropdowns, valorCredito, taxaAdmin, incc, duracaoConsorcio, taxaLivreRisco, dropdowns) {
         const parcela = calcularParcela(valorCredito, taxaAdmin, duracaoConsorcio);
         let totalParcelas = 0;
         let ganhoAplicacoes = 0;
@@ -330,47 +381,6 @@ console.log('Arquivo consorcio.js carregado', new Date().toISOString());
                 percentualLucro
             }
         };
-    }
-
-    function exibirAnaliseTeseDinheiroBarato(analise) {
-        const divAnaliseDinheiroBarato = document.getElementById('analiseDinheiroBarato');
-        if (divAnaliseDinheiroBarato) {
-            divAnaliseDinheiroBarato.innerHTML = `
-                <h3>Análise da Tese "Dinheiro Barato"</h3>
-                <div class="kpi-container">
-                    <div class="kpi">
-                        <i class="fas fa-money-bill-wave"></i>
-                        <h4>Total Captado</h4>
-                        <p>${formatarMoeda(analise.resumo.totalCaptado)}</p>
-                    </div>
-                    <div class="kpi">
-                        <i class="fas fa-hand-holding-usd"></i>
-                        <h4>Total Pago</h4>
-                        <p>${formatarMoeda(analise.resumo.totalPago)}</p>
-                    </div>
-                    <div class="kpi positive">
-                        <i class="fas fa-chart-line"></i>
-                        <h4>Ganho com Aplicações</h4>
-                        <p>${formatarMoeda(analise.resumo.ganhoAplicacoes)}</p>
-                    </div>
-                    <div class="kpi positive">
-                        <i class="fas fa-percentage"></i>
-                        <h4>Ganho com Ágio</h4>
-                        <p>${formatarMoeda(analise.resumo.ganhoAgio)}</p>
-                    </div>
-                    <div class="kpi ${analise.resumo.resultadoLiquido > 0 ? 'positive' : 'negative'}">
-                        <i class="fas fa-balance-scale"></i>
-                        <h4>Resultado Líquido</h4>
-                        <p>${formatarMoeda(analise.resumo.resultadoLiquido)}</p>
-                    </div>
-                    <div class="kpi ${analise.resumo.percentualLucro > 0 ? 'positive' : 'negative'}">
-                        <i class="fas fa-chart-pie"></i>
-                        <h4>Percentual de Lucro</h4>
-                        <p>${analise.resumo.percentualLucro.toFixed(2)}%</p>
-                    </div>
-                </div>
-            `;
-        }
     }
 
     function mostrarGraficoComparativo(analise) {
