@@ -286,8 +286,6 @@ console.log('Arquivo consorcio.js carregado', new Date().toISOString());
         calcularConsorcio();
     }
 
-    // Novas funções para a análise da tese do dinheiro barato
-
     function analiseTeseDinheiroBarato(fluxoBase, fluxoComDropdowns, valorCredito, taxaAdmin, incc, duracaoConsorcio, taxaLivreRisco, dropdowns) {
         const parcela = calcularParcela(valorCredito, taxaAdmin, duracaoConsorcio);
         let totalParcelas = 0;
@@ -299,4 +297,5 @@ console.log('Arquivo consorcio.js carregado', new Date().toISOString());
             const parcelaMes = item.saldoDevedor > 0 ? parcela : 0;
             totalParcelas += parcelaMes;
 
-            const rendimentoMes = saldoAplicado * taxaLivreRisco
+            const rendimentoMes = saldoAplicado * taxaLivreRisco;
+            
