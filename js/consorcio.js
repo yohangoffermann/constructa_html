@@ -190,77 +190,63 @@ console.log('Arquivo consorcio.js carregado', new Date().toISOString());
         `;
     }
 
-    function mostrarGraficoConsorcio(fluxoBase, fluxoComDropdowns) {
-        const ctx = document.getElementById('consorcioChart').getContext('2d');
+    function atualizarTabelaConsorcio(fluxoBase, fluxoComDropdowns) {
+    const tabela = document.getElementById('consorcioTable');
+    
+    // Encontrar o mês onde o saldo devedor chega a zero
+    const indexFinal = fluxoComDropdowns.findIndex(item => item.saldoDevedor <= 0);
+    const mesesRelevantes = [];
+    
+    // Selecionar meses relevantes
+    fluxoBase.forEach((item, index) => {
+        const diferenca = fluxoComDropdowns[index] ? fluxoComDropdowns[index].saldoDevedor - item.saldoDevedor : 0;
         
-        if (window.consorcioChart instanceof Chart) {
-            window.consorcioChart.destroy();
+        // Incluir meses com dropdowns, início de cada ano e mês final
+        if (index === 0 || // Primeiro mês
+            index === indexFinal || // Mês de quitação
+            dropdowns.some(d => d.mes === item.mes) || // Meses com dropdown
+            item.mes % 12 === 1 || // Início de cada ano
+            index === fluxoBase.length - 1) { // Último mês
+            mesesRelevantes.push({
+                mes: item.mes,
+                saldoBase: item.saldoDevedor,
+                saldoDropdowns: fluxoComDropdowns[index].saldoDevedor,
+                diferenca: diferenca
+            });
         }
+    });
 
-        window.consorcioChart = new Chart(ctx, {
-            type: 'line',
-            data: {
-                labels: fluxoBase.map(item => `Mês ${item.mes}`),
-                datasets: [
-                    {
-                        label: 'Saldo Devedor Base',
-                        data: fluxoBase.map(item => item.saldoDevedor),
-                        borderColor: '#0068c9',
-                        backgroundColor: 'rgba(0, 104, 201, 0.1)',
-                        fill: true
-                    },
-                    {
-                        label: 'Saldo Devedor com Dropdowns',
-                        data: fluxoComDropdowns.map(item => item.saldoDevedor),
-                        borderColor: '#29b09d',
-                        backgroundColor: 'rgba(41, 176, 157, 0.1)',
-                        fill: true
-                    }
-                ]
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                aspectRatio: 2,
-                scales: {
-                    x: {
-                        title: {
-                            display: true,
-                            text: 'Mês'
-                        }
-                    },
-                    y: {
-                        title: {
-                            display: true,
-                            text: 'Saldo Devedor (R$)'
-                        },
-                        ticks: {
-                            callback: function(value) {
-                                return formatarMoeda(value);
-                            }
-                        }
-                    }
-                },
-                plugins: {
-                    tooltip: {
-                        callbacks: {
-                            label: function(context) {
-                                let label = context.dataset.label || '';
-                                if (label) {
-                                    label += ': ';
-                                }
-                                label += formatarMoeda(context.parsed.y);
-                                return label;
-                            }
-                        }
-                    },
-                    legend: {
-                        position: 'top',
-                    }
-                }
-            }
-        });
-    }
+    tabela.innerHTML = `
+        <tr>
+            <th>Mês</th>
+            <th>Saldo Devedor Base</th>
+            <th>Saldo Devedor com Dropdowns</th>
+            <th>Diferença</th>
+        </tr>
+        ${mesesRelevantes.map(item => {
+            const highlightClass = Math.abs(item.diferenca) > 0.01 ? 'highlight' : '';
+            return `
+                <tr class="${highlightClass}">
+                    <td>${item.mes}</td>
+                    <td>${formatarMoeda(item.saldoBase)}</td>
+                    <td>${formatarMoeda(item.saldoDropdowns)}</td>
+                    <td>${formatarMoeda(item.diferenca)}</td>
+                </tr>
+            `;
+        }).join('')}
+    `;
+
+    // Adicionar resumo
+    tabela.innerHTML += `
+        <tr class="resumo">
+            <td colspan="4">
+                <strong>Resumo:</strong><br>
+                Mês de quitação: ${indexFinal + 1}<br>
+                Total de parcelas economizadas: ${fluxoBase.length - (indexFinal + 1)}
+            </td>
+        </tr>
+    `;
+}
 
     function exibirAnaliseConsorcio(analise) {
         const divAnalise = document.getElementById('analiseConsorcio');
